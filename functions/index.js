@@ -31,12 +31,19 @@ const authoptions={
   method: "GET",
 };
 
-exports.Loan_attempt=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
+
+exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
+  console.log("Loan attempt called");
   cooltrial();
-  console.log(context.numChildren());
-  console.log("hello dickson Obabo");
-  db.ref("/noname").set("hello dickson");
+//  console.log(context.numChildren());
+  // console.log("hello dickson Obabo");
+  // db.ref("/myname").set("hello dickson");
 });
+
+exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
+  db.ref("/yourname").set("cool bruh it works");
+});
+
 
 app.get("/access_toke", (_req, res)=>{
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
@@ -97,6 +104,33 @@ app.get("/yourname", _access_token, (req, res)=>{
     message: "hello stranger",
   });
 });
+
+function getToken(req, res, next) {
+  const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
+  const consumer_secret="PjfnfGEnm7aVfGba";
+  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
+
+  request({
+    url: url,
+    headers: {
+      "Authorization": auth,
+    }}, (error, response, body)=>{
+    if (error!==null) {
+      res.json(error);
+      console.log(error);
+    }
+    req.access_token=(JSON.parse(body)).access_token;
+    next();
+  });
+  return req.access_token;
+}
+
+const coolPromise = new Promise((resolve, reject) =>{
+
+});
+
+
 function cooltrial(req, res, next) {
   let token="";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
@@ -112,30 +146,50 @@ function cooltrial(req, res, next) {
 
     console.log(JSON.parse(body).access_token);
     token=JSON.parse(body).access_token;
-    req.access_token=(JSON.parse(body)).access_token;
+    // req.access_token=(JSON.parse(body)).access_token;
+
+    request({
+      method: "POST",
+      url: endpoint,
+      headers: {
+        "Authorization": "Bearer " + token,
+      }, json: {
+        "ShortCode": "600000",
+        "ResponseType": "Completed",
+        "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
+        "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+      },
+    }, (error, reponse, body)=>{
+      if (error) {
+        console.log(error);
+        res.json(error);
+      }
+      res.status(200).json(body);
+      console.log(body);
+    });
     next();
   });
-  // const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
 
-  // request({
-  //   method: "POST",
-  //   url: endpoint,
-  //   headers: {
-  //     "Authorization": "Bearer " + req.access_token,
-  //   }, json: {
-  //     "ShortCode": "600000",
-  //     "ResponseType": "Completed",
-  //     "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
-  //     "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
-  //   },
-  // }, (error, reponse, body)=>{
-  //   if (error) {
-  //     console.log(error);
-  //     res.json(error);
-  //   }
-  //   res.status(200).json(body);
-  //   console.log(body);
-  // });
+  request({
+    method: "POST",
+    url: endpoint,
+    headers: {
+      "Authorization": "Bearer " + token,
+    }, json: {
+      "ShortCode": "600000",
+      "ResponseType": "Completed",
+      "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
+      "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+    },
+  }, (error, reponse, body)=>{
+    if (error) {
+      console.log(error);
+      res.json(error);
+    }
+    res.status(200).json(body);
+    console.log(body);
+  });
 }
 
 app.get("/register", _access_token, (req, res)=>{
