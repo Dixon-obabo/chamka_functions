@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
+
 const functions = require("firebase-functions");
 const express=require("express");
 const request=require("request");
@@ -35,9 +36,7 @@ const authoptions={
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
   console.log("Loan attempt called");
   cooltrial();
-//  console.log(context.numChildren());
-  // console.log("hello dickson Obabo");
-  // db.ref("/myname").set("hello dickson");
+
 });
 
 exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
@@ -127,7 +126,8 @@ function getToken(req, res, next) {
 }
 
 const coolPromise = new Promise((resolve, reject) =>{
-
+  
+  //this was created by jason.
 });
 
 
