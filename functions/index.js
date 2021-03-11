@@ -35,7 +35,9 @@ const authoptions={
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
   console.log("Loan attempt called");
-  cooltrial();
+  // cooltrial();
+
+  return cooltrial()
 
 });
 
@@ -127,11 +129,11 @@ function getToken(req, res, next) {
 
 const coolPromise = new Promise((resolve, reject) =>{
   
-  //this was created by jason.
+  //this was created by jayson.
 });
 
 
-function cooltrial(req, res, next) {
+function cooltrial(req, res) {
   let token="";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   request({
@@ -146,9 +148,56 @@ function cooltrial(req, res, next) {
 
     console.log(JSON.parse(body).access_token);
     token=JSON.parse(body).access_token;
+
+    return next(token)
     // req.access_token=(JSON.parse(body)).access_token;
 
-    request({
+    // request({
+    //   method: "POST",
+    //   url: endpoint,
+    //   headers: {
+    //     "Authorization": "Bearer " + token,
+    //   }, json: {
+    //     "ShortCode": "600000",
+    //     "ResponseType": "Completed",
+    //     "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
+    //     "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+    //   },
+    // }, (error, reponse, body)=>{
+    //   if (error) {
+    //     console.log(error);
+    //     res.json(error);
+    //   }
+    //   res.status(200).json(body);
+    //   console.log(body);
+    // });
+    // return next();
+  });
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+
+  // request({
+  //   method: "POST",
+  //   url: endpoint,
+  //   headers: {
+  //     "Authorization": "Bearer " + token,
+  //   }, json: {
+  //     "ShortCode": "600000",
+  //     "ResponseType": "Completed",
+  //     "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
+  //     "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+  //   },
+  // }, (error, reponse, body)=>{
+  //   if (error) {
+  //     console.log(error);
+  //     res.json(error);
+  //   }
+  //   res.status(200).json(body);
+  //   console.log(body);
+  // });
+}
+function next(token){
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+  request({
       method: "POST",
       url: endpoint,
       headers: {
@@ -159,37 +208,14 @@ function cooltrial(req, res, next) {
         "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
         "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
       },
-    }, (error, reponse, body)=>{
+    }, (error, response, body)=>{
       if (error) {
         console.log(error);
-        res.json(error);
+        // response.json(error);
       }
-      res.status(200).json(body);
+      // response.status(200).json(body);
       console.log(body);
     });
-    next();
-  });
-  const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
-
-  request({
-    method: "POST",
-    url: endpoint,
-    headers: {
-      "Authorization": "Bearer " + token,
-    }, json: {
-      "ShortCode": "600000",
-      "ResponseType": "Completed",
-      "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
-      "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
-    },
-  }, (error, reponse, body)=>{
-    if (error) {
-      console.log(error);
-      res.json(error);
-    }
-    res.status(200).json(body);
-    console.log(body);
-  });
 }
 
 app.get("/register", _access_token, (req, res)=>{
