@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
@@ -34,9 +35,40 @@ const authoptions={
 
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
-  console.log("Loan attempt called");
-  cooltrial();
+  // gttoken().then((response)=>{
+  //   console.log(response);
+  // });
+  const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
+  const consumer_secret="PjfnfGEnm7aVfGba";
+  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
+  const authOptions = {
+    host: "sandbox.safaricom.co.ke",
+    path: "/oauth/v1/generate?grant_type=client_credentials",
+    headers: {
+      "Authorization": auth,
+    },
+    method: "GET",
+  };
 
+  const ttoken=new Promise((resolve)=>{
+    https.request(authOptions, (res)=>{
+      res.on("data", (chunk)=>{
+        // resolve(JSON.parse(chunk).access_token);
+      });
+      res.on("end", (data)=>{
+        // console.log("the data has been retrived");
+        resolve("Dickson Obabo");
+      });
+    });
+  });
+  ttoken.then((response)=>{
+    console.log(response);
+  });
+  console.log(Promise.resolve(ttoken));
+
+  // console.log(Promise.resolve(ttoken));
+  // console.log(ttoken.);
 });
 
 exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
@@ -104,30 +136,106 @@ app.get("/yourname", _access_token, (req, res)=>{
   });
 });
 
+function gttoken() {
+  return new Promise((resolve, reject)=>{
+    const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
+    const consumer_secret="PjfnfGEnm7aVfGba";
+    const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+    const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
+    const authOptions = {
+      host: "sandbox.safaricom.co.ke",
+      path: "/oauth/v1/generate?grant_type=client_credentials",
+      headers: {
+        "Authorization": auth,
+      },
+      method: "GET",
+    };
+
+
+    // request({
+    //   url: url,
+    //   headers: {
+    //     "Authorization": auth,
+    //   }}, (error, response, body)=>{
+    //   if (error!==null) {
+    //     res.json(error);
+    //     console.log(error);
+    //   }
+    //   // token=(JSON.parse(body)).access_token;
+    //   resolve((JSON.parse(body)).access_token);
+    //   req.access_token=(JSON.parse(body)).access_token;
+    //   next();
+    // });
+
+
+    https.request(authOptions, (response)=>{
+      const data=[];
+      response.on("data", (chunk)=>{
+        data.push(chunk);
+        console.log(chunk);
+        // console.log(chunk);
+        // return chunk;
+        // try {
+        //   resolve(chunk.access_token);
+        // } catch (Error) {
+        //   console.error();
+        // }
+      });
+      response.setEncoding("utf8");
+      response.on("end", (rata)=>{
+        console.log(JSON.parse(rata).access_token);
+
+        console.log("The request has ended with this");
+        resolve("Hello Dickson");
+      });
+    });
+  });
+}
+
 function getToken(req, res, next) {
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-
-  request({
-    url: url,
+  const authOptions = {
+    host: "sandbox.safaricom.co.ke",
+    path: "/oauth/v1/generate?grant_type=client_credentials",
     headers: {
       "Authorization": auth,
-    }}, (error, response, body)=>{
-    if (error!==null) {
-      res.json(error);
-      console.log(error);
-    }
-    req.access_token=(JSON.parse(body)).access_token;
-    next();
+    },
+    method: "GET",
+  };
+
+  const token= https.request(authOptions, (response)=>{
+    const data=[];
+    response.on("data", (chunk)=>{
+      data.push(chunk);
+      return chunk;
+    });
+  }).on("finish", (rata)=>{
+    console.log(rata);
   });
-  return req.access_token;
+
+  // request({
+  //   url: url,
+  //   headers: {
+  //     "Authorization": auth,
+  //   }}, (error, response, body)=>{
+  //   if (error!==null) {
+  //     res.json(error);
+  //     console.log(error);
+  //   }
+  //   token=(JSON.parse(body)).access_token;
+  //   req.access_token=(JSON.parse(body)).access_token;
+  //   next();
+  // });
+  // return token;
+  // console.log(token);
 }
 
 const coolPromise = new Promise((resolve, reject) =>{
-  
-  //this was created by jason.
+
+  // this was created by jason.
 });
 
 
@@ -242,4 +350,63 @@ app.get("/c2b/validate", (req, res)=>{
   res.status(200).json({
     message: "it works",
   });
+});
+app.get("/stk", _access_token, (req, res)=>{
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+  const auth="Bearer "+getToken();
+  const fom=new Date().toLocaleString("en-US", {timeZone: "Africa/Nairobi"});
+  const cool= new Date(fom);// .toISOString();
+  const all=String(cool.getFullYear())+String(cool.getMonth()+1)+String(cool.getDate())+String(cool.getHours())+String(cool.getMinutes())+String(cool.getSeconds());
+  const year =cool.getFullYear();
+  const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
+  const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
+  request(
+      {
+        method: "POST",
+        url: endpoint,
+        headers: {
+          "Authorization": auth,
+        },
+        json: {
+          "BusinessShortCode": "174379",
+          "Password": pword,
+          "Timestamp": nope,
+          "TransactionType": "CustomerPayBillOnline",
+          "Amount": "2",
+          "PartyA": "254796142444",
+          "PartyB": "174379",
+          "PhoneNumber": "254796142444",
+          "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/lmstk",
+          "AccountReference": " Dickson Obabo",
+          "TransactionDesc": " look the web version works",
+        },
+      },
+      function(error, response, body) {
+        console.log(error);
+        console.log(all);
+        // TODO: Use the body object to extract the response
+        console.log(body);
+      }
+  );
+});
+
+app.get("/stk2", gttoken, (req, res)=>{
+  // getToken();
+  let tt="";
+  gttoken().then((response)=>{
+    // console.log(response.access_token);
+    // num=response;
+
+    tt=response;
+    console.log(response);
+    // res.send(response);
+  });
+
+  res.send(tt);
+  // console.log(num);
+  // res.send(num);
+});
+
+app.post("/lmstk", (req, res)=>{
+  console.log(req.body);
 });
