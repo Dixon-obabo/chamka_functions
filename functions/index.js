@@ -6,6 +6,7 @@
 
 const functions = require("firebase-functions");
 const express=require("express");
+const axios=require("axios").default;
 const request=require("request");
 const app=express();
 const https=require("https");
@@ -37,7 +38,8 @@ const authoptions={
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
   // gttoken().then((response)=>{
   //   console.log(response);
-  // });
+  // // });
+
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
@@ -50,22 +52,38 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
     },
     method: "GET",
   };
+  axios({method: "get",
+    url: url,
+    headers: {
+      "Authorization": auth,
+    },
+  }).then((response)=>{
+    console.log(response.data);
+    console.log("The data get has worked");
+  }).catch((error)=>{
+    console.log(error);
+  });
 
-  const ttoken=new Promise((resolve)=>{
-    https.request(authOptions, (res)=>{
-      res.on("data", (chunk)=>{
-        // resolve(JSON.parse(chunk).access_token);
-      });
-      res.on("end", (data)=>{
-        // console.log("the data has been retrived");
-        resolve("Dickson Obabo");
-      });
-    });
-  });
-  ttoken.then((response)=>{
-    console.log(response);
-  });
-  console.log(Promise.resolve(ttoken));
+
+  // axios.default.get(authOptions).then((response)=>{
+  //   console.log(response);
+  // });
+
+  // const ttoken=new Promise((resolve)=>{
+  //   https.request(authOptions, (res)=>{
+  //     res.on("data", (chunk)=>{
+  //       // resolve(JSON.parse(chunk).access_token);
+  //     });
+  //     res.on("end", (data)=>{
+  //       // console.log("the data has been retrived");
+  //       resolve("Dickson Obabo");
+  //     });
+  //   });
+  // });
+  // ttoken.then((response)=>{
+  //   console.log(response);
+  // });
+  // console.log(Promise.resolve(ttoken));
 
   // console.log(Promise.resolve(ttoken));
   // console.log(ttoken.);
