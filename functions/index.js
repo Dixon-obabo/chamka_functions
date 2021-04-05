@@ -36,12 +36,11 @@ const authoptions={
 
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
-  
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-  
+
   axios({method: "get",
     url: url,
     headers: {
@@ -53,8 +52,6 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
   }).catch((error)=>{
     console.log(error);
   });
-
-
 });
 
 exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
@@ -116,9 +113,6 @@ function _access_token(req, res, next) {
 }
 
 
-
-
-
 function getToken(req, res, next) {
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
@@ -142,22 +136,6 @@ function getToken(req, res, next) {
   }).on("finish", (rata)=>{
     console.log(rata);
   });
-
-  // request({
-  //   url: url,
-  //   headers: {
-  //     "Authorization": auth,
-  //   }}, (error, response, body)=>{
-  //   if (error!==null) {
-  //     res.json(error);
-  //     console.log(error);
-  //   }
-  //   token=(JSON.parse(body)).access_token;
-  //   req.access_token=(JSON.parse(body)).access_token;
-  //   next();
-  // });
-  // return token;
-  // console.log(token);
 }
 
 const coolPromise = new Promise((resolve, reject) =>{
@@ -317,23 +295,3 @@ app.get("/stk", _access_token, (req, res)=>{
   );
 });
 
-app.get("/stk2", gttoken, (req, res)=>{
-  // getToken();
-  let tt="";
-  gttoken().then((response)=>{
-    // console.log(response.access_token);
-    // num=response;
-
-    tt=response;
-    console.log(response);
-    // res.send(response);
-  });
-
-  res.send(tt);
-  // console.log(num);
-  // res.send(num);
-});
-
-app.post("/lmstk", (req, res)=>{
-  console.log(req.body);
-});
