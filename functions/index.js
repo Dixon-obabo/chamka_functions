@@ -36,22 +36,12 @@ const authoptions={
 
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
-  // gttoken().then((response)=>{
-  //   console.log(response);
-  // // });
-
+  
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-  const authOptions = {
-    host: "sandbox.safaricom.co.ke",
-    path: "/oauth/v1/generate?grant_type=client_credentials",
-    headers: {
-      "Authorization": auth,
-    },
-    method: "GET",
-  };
+  
   axios({method: "get",
     url: url,
     headers: {
@@ -65,28 +55,6 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
   });
 
 
-  // axios.default.get(authOptions).then((response)=>{
-  //   console.log(response);
-  // });
-
-  // const ttoken=new Promise((resolve)=>{
-  //   https.request(authOptions, (res)=>{
-  //     res.on("data", (chunk)=>{
-  //       // resolve(JSON.parse(chunk).access_token);
-  //     });
-  //     res.on("end", (data)=>{
-  //       // console.log("the data has been retrived");
-  //       resolve("Dickson Obabo");
-  //     });
-  //   });
-  // });
-  // ttoken.then((response)=>{
-  //   console.log(response);
-  // });
-  // console.log(Promise.resolve(ttoken));
-
-  // console.log(Promise.resolve(ttoken));
-  // console.log(ttoken.);
 });
 
 exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
@@ -148,67 +116,8 @@ function _access_token(req, res, next) {
 }
 
 
-app.get("/yourname", _access_token, (req, res)=>{
-  res.status(200).json({
-    message: "hello stranger",
-  });
-});
-
-function gttoken() {
-  return new Promise((resolve, reject)=>{
-    const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
-    const consumer_secret="PjfnfGEnm7aVfGba";
-    const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-    const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-    const authOptions = {
-      host: "sandbox.safaricom.co.ke",
-      path: "/oauth/v1/generate?grant_type=client_credentials",
-      headers: {
-        "Authorization": auth,
-      },
-      method: "GET",
-    };
 
 
-    // request({
-    //   url: url,
-    //   headers: {
-    //     "Authorization": auth,
-    //   }}, (error, response, body)=>{
-    //   if (error!==null) {
-    //     res.json(error);
-    //     console.log(error);
-    //   }
-    //   // token=(JSON.parse(body)).access_token;
-    //   resolve((JSON.parse(body)).access_token);
-    //   req.access_token=(JSON.parse(body)).access_token;
-    //   next();
-    // });
-
-
-    https.request(authOptions, (response)=>{
-      const data=[];
-      response.on("data", (chunk)=>{
-        data.push(chunk);
-        console.log(chunk);
-        // console.log(chunk);
-        // return chunk;
-        // try {
-        //   resolve(chunk.access_token);
-        // } catch (Error) {
-        //   console.error();
-        // }
-      });
-      response.setEncoding("utf8");
-      response.on("end", (rata)=>{
-        console.log(JSON.parse(rata).access_token);
-
-        console.log("The request has ended with this");
-        resolve("Hello Dickson");
-      });
-    });
-  });
-}
 
 function getToken(req, res, next) {
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
