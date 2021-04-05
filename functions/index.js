@@ -9,7 +9,6 @@ const express=require("express");
 const axios=require("axios").default;
 const request=require("request");
 const app=express();
-const https=require("https");
 const moment= require("moment-timezone");
 const admin=require("firebase-admin");
 admin.initializeApp();
@@ -25,14 +24,6 @@ app.get("/", (_req, res)=>{
     name: "Dickson",
   });
 });
-const authoptions={
-  host: "sandbox.safaricom.co.ke",
-  path: "/oauth/v1/generate?grant_type=client_credentials",
-  headers: {
-    "Authorization": auth,
-  },
-  method: "GET",
-};
 
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
@@ -113,98 +104,6 @@ function _access_token(req, res, next) {
 }
 
 
-function getToken(req, res, next) {
-  const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
-  const consumer_secret="PjfnfGEnm7aVfGba";
-  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-  const authOptions = {
-    host: "sandbox.safaricom.co.ke",
-    path: "/oauth/v1/generate?grant_type=client_credentials",
-    headers: {
-      "Authorization": auth,
-    },
-    method: "GET",
-  };
-
-  const token= https.request(authOptions, (response)=>{
-    const data=[];
-    response.on("data", (chunk)=>{
-      data.push(chunk);
-      return chunk;
-    });
-  }).on("finish", (rata)=>{
-    console.log(rata);
-  });
-}
-
-const coolPromise = new Promise((resolve, reject) =>{
-
-  // this was created by jason.
-});
-
-
-function cooltrial(req, res, next) {
-  let token="";
-  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-  request({
-    url: url,
-    headers: {
-      "Authorization": auth,
-    }}, (error, response, body)=>{
-    if (error!==null) {
-      res.json(error);
-      console.log(error);
-    }
-
-    console.log(JSON.parse(body).access_token);
-    token=JSON.parse(body).access_token;
-    // req.access_token=(JSON.parse(body)).access_token;
-
-    request({
-      method: "POST",
-      url: endpoint,
-      headers: {
-        "Authorization": "Bearer " + token,
-      }, json: {
-        "ShortCode": "600000",
-        "ResponseType": "Completed",
-        "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
-        "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
-      },
-    }, (error, reponse, body)=>{
-      if (error) {
-        console.log(error);
-        res.json(error);
-      }
-      res.status(200).json(body);
-      console.log(body);
-    });
-    next();
-  });
-  const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
-
-  request({
-    method: "POST",
-    url: endpoint,
-    headers: {
-      "Authorization": "Bearer " + token,
-    }, json: {
-      "ShortCode": "600000",
-      "ResponseType": "Completed",
-      "ConfirmationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/confirm",
-      "ValidationURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
-    },
-  }, (error, reponse, body)=>{
-    if (error) {
-      console.log(error);
-      res.json(error);
-    }
-    res.status(200).json(body);
-    console.log(body);
-  });
-}
-
 app.get("/register", _access_token, (req, res)=>{
   const endpoint="https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
 
@@ -256,9 +155,10 @@ app.get("/c2b/validate", (req, res)=>{
     message: "it works",
   });
 });
+
 app.get("/stk", _access_token, (req, res)=>{
   const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
-  const auth="Bearer "+getToken();
+  const auth="Bearer "+req.access_token;
   const fom=new Date().toLocaleString("en-US", {timeZone: "Africa/Nairobi"});
   const cool= new Date(fom);// .toISOString();
   const all=String(cool.getFullYear())+String(cool.getMonth()+1)+String(cool.getDate())+String(cool.getHours())+String(cool.getMinutes())+String(cool.getSeconds());
