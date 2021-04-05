@@ -38,7 +38,7 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
       "Authorization": auth,
     },
   }).then((response)=>{
-    console.log(response.data);
+    console.log(response.data.access_token);
     console.log("The data get has worked");
   }).catch((error)=>{
     console.log(error);
