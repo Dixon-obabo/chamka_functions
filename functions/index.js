@@ -11,12 +11,10 @@ const request=require("request");
 const app=express();
 const moment= require("moment-timezone");
 const admin=require("firebase-admin");
+const cors=require("cors");
 admin.initializeApp();
 const db=admin.database();
-const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
-const consumer_secret="PjfnfGEnm7aVfGba";
-const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
-
+app.use(cors({origin: true}));
 
 exports.main = functions.https.onRequest(app);
 app.get("/", (_req, res)=>{
@@ -24,22 +22,66 @@ app.get("/", (_req, res)=>{
     name: "Dickson",
   });
 });
+app.post("/random", (req, res)=>{
+  console.log("the random post method works");
+  console.log(req.body);
+  res.send("random completed");
+});
 
 
 exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
-  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
 
+  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
+  const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
+  const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
+
+  let tokken="";
   axios({method: "get",
     url: url,
     headers: {
       "Authorization": auth,
     },
   }).then((response)=>{
+    tokken=response.data.access_token;
     console.log(response.data.access_token);
     console.log("The data get has worked");
+
+
+    request(
+        {
+          method: "POST",
+          url: endpoint,
+          headers: {
+            "Authorization": "Bearer "+ response.data.access_token,
+          },
+          json: {
+            "BusinessShortCode": "174379",
+            "Password": pword,
+            "Timestamp": nope,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": "2",
+            "PartyA": "254796142444",
+            "PartyB": "174379",
+            "PhoneNumber": "254796142444",
+            "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
+            "AccountReference": " Dickson Obabo",
+            "TransactionDesc": " look the web version works",
+          },
+        },
+        function(error, respone, body) {
+          if (error) {
+            console.log(error);
+          }
+
+          // console.log(all);
+          // TODO: Use the body object to extract the response
+          console.log(body);
+        }
+    );
   }).catch((error)=>{
     console.log(error);
   });
@@ -165,6 +207,7 @@ app.get("/stk", _access_token, (req, res)=>{
   const year =cool.getFullYear();
   const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
   const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
+
   request(
       {
         method: "POST",
@@ -181,17 +224,29 @@ app.get("/stk", _access_token, (req, res)=>{
           "PartyA": "254796142444",
           "PartyB": "174379",
           "PhoneNumber": "254796142444",
-          "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/lmstk",
+          "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
           "AccountReference": " Dickson Obabo",
           "TransactionDesc": " look the web version works",
         },
       },
       function(error, response, body) {
-        console.log(error);
-        console.log(all);
+        if (error) {
+          console.log(error);
+        }
+        res.json(body);
         // TODO: Use the body object to extract the response
         console.log(body);
       }
   );
+});
+
+app.post("/stk/lmstk", (req, res)=>{
+  console.log(".............body.........");
+  console.log(JSON.stringify(req.body));
+
+  res.send("lmstk completed");
+});
+app.put("/stk/lmstk", (req, res)=>{
+  console.log("There has been a put function call");
 });
 
