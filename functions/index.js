@@ -77,8 +77,6 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
             console.log(error);
           }
 
-          // console.log(all);
-          // TODO: Use the body object to extract the response
           console.log(body);
         }
     );
@@ -234,7 +232,7 @@ app.get("/stk", _access_token, (req, res)=>{
           console.log(error);
         }
         res.json(body);
-        // TODO: Use the body object to extract the response
+
         console.log(body);
       }
   );
@@ -242,11 +240,7 @@ app.get("/stk", _access_token, (req, res)=>{
 
 app.post("/stk/lmstk", (req, res)=>{
   console.log(".............body.........");
-  console.log(JSON.stringify(req.body));
-
-  res.send("lmstk completed");
-});
-app.put("/stk/lmstk", (req, res)=>{
-  console.log("There has been a put function call");
+  console.log(req.body.Body.stkCallback);
+  res.status(200);
 });
 
