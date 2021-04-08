@@ -97,7 +97,7 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-  const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest";
   const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
   const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
   const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
@@ -115,16 +115,16 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
       headers: {
         "Authorization": "Bearer "+ response.data.access_token,
       }, json: {
-        "InitiatorName": " ",
-        "SecurityCredential": " ",
-        "CommandID": " ",
-        "Amount": " ",
-        "PartyA": " ",
-        "PartyB": " ",
-        "Remarks": " ",
-        "QueueTimeOutURL": "http://your_timeout_url",
-        "ResultURL": "http://your_result_url",
-        "Occasion": " ",
+        "InitiatorName": "apitest",
+        "SecurityCredential": "Se0HgfA8WqRQ9WtQfKj9YjOSINYsQlUmojYlA40iIUxFAP4h8RgnJiG4AJ9A8suugSgWde+XVFolFa/bYg/+oms7tIanX1sYnaoFpIPuM2QTWNkkquo2YPJ/lpT+HKMDTisFjLA98g+lc1OyANEHTyxqi7iK/gJDbeGOe7mbNqaNOR6vnsQublR5tALJWjENW9Rmi3drpLtZLrdalym2YrCSkzqzoVPyp4tWNk/LS/7I4pBwuE5HjDx8Wu6n8Fee5J8QMlWckqxiITLe/1ap6EOlvpjW9fMy8Ir6Z97jaIirlUBe/NU3L1tOevx/GsFt0dXlCY4gn3g65STT4AYTTQ==",
+        "CommandID": "BusinessPayment",
+        "Amount": "2300",
+        "PartyA": "600000",
+        "PartyB": "254796142444",
+        "Remarks": "You Won Nigga",
+        "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
+        "ResultURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+        "Occasion": "no occasion",
       }}, function(error, response, body) {
       if (error) {
         console.log(error);
@@ -233,19 +233,14 @@ app.post("/c2b/confirm", (req, res)=>{
 
 
 app.post("/c2b/validate", (req, res)=>{
-  console.log(res.body);
-  res.status(200).json({
-    "ResultCode": 0,
-    "ResultDesc": "Success",
-  });
-  db.ref("/comp").set(res.body);
+  console.log(req.body);
+  res.status(200);
 });
 
 
 app.get("/c2b/validate", (req, res)=>{
-  res.status(200).json({
-    message: "it works",
-  });
+  console.log(req.body);
+  res.status(200);
 });
 
 app.get("/stk", _access_token, (req, res)=>{
@@ -292,7 +287,8 @@ app.get("/stk", _access_token, (req, res)=>{
 
 app.post("/stk/lmstk", (req, res)=>{
   console.log(".............body.........");
-  console.log(req.body.Body.stkCallback);
+  console.log(req.body);
+  // console.log(req.body.Body.stkCallback);
   res.status(200);
 });
 
