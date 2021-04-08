@@ -91,8 +91,54 @@ exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((s
   return null;
 });
 
-exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
-  db.ref("/yourname").set("cool bruh it works");
+exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snapshot, context )=>{
+  // db.ref("/yourname").set("cool bruh it works");
+  // console.log(snapshot.val());
+  const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
+  const consumer_secret="PjfnfGEnm7aVfGba";
+  const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+  const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
+  const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
+  const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
+  let token="";
+  axios({method: "get",
+    url: url,
+    headers: {
+      "Authorization": auth,
+    },
+  }).then((response)=>{
+    token=response.data.access_token;
+    request({
+      method: "POST",
+      url: endpoint,
+      headers: {
+        "Authorization": "Bearer "+ response.data.access_token,
+      }, json: {
+        "InitiatorName": " ",
+        "SecurityCredential": " ",
+        "CommandID": " ",
+        "Amount": " ",
+        "PartyA": " ",
+        "PartyB": " ",
+        "Remarks": " ",
+        "QueueTimeOutURL": "http://your_timeout_url",
+        "ResultURL": "http://your_result_url",
+        "Occasion": " ",
+      }}, function(error, response, body) {
+      if (error) {
+        console.log(error);
+      }
+      console.log(body);
+    });
+  }).catch((error)=>{
+    console.log(error);
+  });
+  const phone=snapshot.val().phonenum;
+  const nm=phone.substr(1, 9);
+  const PhoneNumber="254"+nm;
+  console.log(PhoneNumber);
+  return null;
 });
 
 
