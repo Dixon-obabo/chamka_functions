@@ -29,10 +29,15 @@ app.post("/random", (req, res)=>{
 });
 
 
-exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((context, snapshot)=>{
+exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((snapshot, context )=>{
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
-
+  console.log(snapshot.val().phonenum);
+  console.log(snapshot.val().amount);
+  const phone=snapshot.val().phonenum;
+  const num=phone.substr(1, 9);
+  const PhoneNumber="254"+num;
+  console.log(PhoneNumber);
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   const endpoint="https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
   const auth="Basic "+ new Buffer(consumer_key+":"+consumer_secret).toString("base64");
@@ -63,10 +68,10 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
             "Password": pword,
             "Timestamp": nope,
             "TransactionType": "CustomerPayBillOnline",
-            "Amount": "2",
-            "PartyA": "254796142444",
+            "Amount": snapshot.val().amount,
+            "PartyA": snapshot.val().phonenum,
             "PartyB": "174379",
-            "PhoneNumber": "254796142444",
+            "PhoneNumber": PhoneNumber,
             "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
             "AccountReference": " Dickson Obabo",
             "TransactionDesc": " look the web version works",
@@ -83,6 +88,7 @@ exports.Loan_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((cont
   }).catch((error)=>{
     console.log(error);
   });
+  return null;
 });
 
 exports.attampts=functions.database.ref("/Att_Depo").onCreate((context, snapshot)=>{
