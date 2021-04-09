@@ -32,6 +32,7 @@ app.post("/random", (req, res)=>{
 exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((snapshot, context )=>{
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
+  const keyy=snapshot.key;
   console.log(snapshot.val().phonenum);
   console.log(snapshot.val().amount);
   const phone=snapshot.val().phonenum;
@@ -73,7 +74,7 @@ exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((s
             "PartyB": "174379",
             "PhoneNumber": PhoneNumber,
             "CallBackURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
-            "AccountReference": " Dickson Obabo",
+            "AccountReference": snapshot.val().phonenum,
             "TransactionDesc": " look the web version works",
           },
         },
@@ -82,6 +83,7 @@ exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((s
             console.log(error);
           }
 
+          db.ref("saf_deposit_req").child(keyy).set(body);
           console.log(body);
         }
     );
@@ -286,9 +288,14 @@ app.get("/stk", _access_token, (req, res)=>{
 });
 
 app.post("/stk/lmstk", (req, res)=>{
-  console.log(".............body.........");
-  console.log(req.body);
-  // console.log(req.body.Body.stkCallback);
+  console.log(".............body..........");
+
+  db.ref("saf_deposit_req").limitToLast(1).on("value", (snapshot, context)=>{
+    const cool =JSON.stringify(snapshot.val());
+    const no=cool.split(":");
+    db.ref("saf_deposit_res").child(no[0].substring(1)).set(req.body.Body.stkCallback);
+  });
+
   res.status(200);
 });
 
