@@ -234,9 +234,11 @@ app.post("/c2b/confirm", (req, res)=>{
 });
 
 
-app.post("/c2b/validate", (req, res)=>{
+app.post("/c2b/validate", (req, res, next)=>{
+  console.log(".......validate........");
   console.log(req.body);
   res.status(200);
+  // next();
 });
 
 
@@ -289,12 +291,64 @@ app.get("/stk", _access_token, (req, res)=>{
 
 app.post("/stk/lmstk", (req, res)=>{
   console.log(".............body..........");
+  if (req.body.Body.stkCallback.ResultDesc=="Request cancelled by user") {
+    // console.log("hello you");
 
-  db.ref("saf_deposit_req").limitToLast(1).on("value", (snapshot, context)=>{
-    const cool =JSON.stringify(snapshot.val());
-    const no=cool.split(":");
-    db.ref("saf_deposit_res").child(no[0].substring(1)).set(req.body.Body.stkCallback);
-  });
+    db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
+      const cool=JSON.stringify(snapshot.val());
+      const no=cool.split(":");
+
+      const key=JSON.parse(no[0].substring(1));
+      const am=no[1].toString().substring(1)+":"+no[2].toString();
+      const an=am.split(",");
+      const amount=an[0].split(":");
+      console.log(amount[1]);
+      // console.log(key);
+      // const ok=snapshot.val().JSON.parse(key);
+
+      const trans={"TransactionType": "Deposit",
+        "Status": "Failed",
+        "Amount": amount[1],
+        "userid": "The user id should be here"};
+
+      db.ref("Transactions").child(key).set(trans);
+    });
+  } else if (req.body.Body.stkCallback.ResultDesc=="The service request is processed successfully.") {
+    db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
+      const cool=JSON.stringify(snapshot.val());
+      const no=cool.split(":");
+
+      const key=JSON.parse(no[0].substring(1));
+      console.log(key);
+      // const ok=snapshot.val().JSON.parse(key);
+
+      const trans={"TransactionType": "Deposit",
+        "Status": "Succeded",
+        "Amount": "100"};
+
+      db.ref("Transactions").child(key).set(trans);
+    });
+
+
+    // const cool=JSON.stringify(snapshot.val());
+    // const no=cool.split(":");
+
+    // const key=JSON.parse(no[0].substring(1));
+    // console.log(key);
+    // const trans={"TransactionType": "Deposit",
+    //   "Status": "Failed",
+    //   "Amount": "100"};
+
+    // db.ref("Transactions").child().set(trans);
+    // console.log("ssuupppp bbbroooo");
+  }
+
+
+  // db.ref("saf_deposit_req").limitToLast(1).on("value", (snapshot, context)=>{
+  //   const cool =JSON.stringify(snapshot.val());
+  //   const no=cool.split(":");
+  //   db.ref("saf_deposit_res").child(JSON.parse(no[0].substring(1))).set(req.body.Body.stkCallback);
+  // });
 
   res.status(200);
 });
