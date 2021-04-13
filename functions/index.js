@@ -303,12 +303,10 @@ app.post("/stk/lmstk", (req, res)=>{
       const an=am.split(",");
       const amount=an[0].split(":");
       console.log(amount[1]);
-      // console.log(key);
-      // const ok=snapshot.val().JSON.parse(key);
 
       const trans={"TransactionType": "Deposit",
         "Status": "Failed",
-        "Amount": amount[1],
+        "Amount": JSON.parse(amount[1].toString()),
         "userid": "The user id should be here"};
 
       db.ref("Transactions").child(key).set(trans);
@@ -320,7 +318,6 @@ app.post("/stk/lmstk", (req, res)=>{
 
       const key=JSON.parse(no[0].substring(1));
       console.log(key);
-      // const ok=snapshot.val().JSON.parse(key);
 
       const trans={"TransactionType": "Deposit",
         "Status": "Succeded",
