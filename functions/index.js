@@ -292,22 +292,28 @@ app.get("/stk", _access_token, (req, res)=>{
 app.post("/stk/lmstk", (req, res)=>{
   console.log(".............body..........");
   if (req.body.Body.stkCallback.ResultDesc=="Request cancelled by user") {
-    // console.log("hello you");
-
     db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
       const cool=JSON.stringify(snapshot.val());
+
       const no=cool.split(":");
+      const not =cool.split(",");
+      const timestamp=not[2].split("at");
+      console.log(not[0]);
+      console.log(not[1]);
+      console.log(timestamp[1]);
+      // console.log(snapshot.val());
+      // console.log(cool);
 
       const key=JSON.parse(no[0].substring(1));
       const am=no[1].toString().substring(1)+":"+no[2].toString();
       const an=am.split(",");
       const amount=an[0].split(":");
-      console.log(amount[1]);
 
       const trans={"TransactionType": "Deposit",
         "Status": "Failed",
         "Amount": JSON.parse(amount[1].toString()),
-        "userid": "The user id should be here"};
+        "userid": "The user id should be here",
+        "Timestamp": "Timestamp should be here"};
 
       db.ref("Transactions").child(key).set(trans);
     });
@@ -325,27 +331,8 @@ app.post("/stk/lmstk", (req, res)=>{
 
       db.ref("Transactions").child(key).set(trans);
     });
-
-
-    // const cool=JSON.stringify(snapshot.val());
-    // const no=cool.split(":");
-
-    // const key=JSON.parse(no[0].substring(1));
-    // console.log(key);
-    // const trans={"TransactionType": "Deposit",
-    //   "Status": "Failed",
-    //   "Amount": "100"};
-
-    // db.ref("Transactions").child().set(trans);
-    // console.log("ssuupppp bbbroooo");
   }
 
-
-  // db.ref("saf_deposit_req").limitToLast(1).on("value", (snapshot, context)=>{
-  //   const cool =JSON.stringify(snapshot.val());
-  //   const no=cool.split(":");
-  //   db.ref("saf_deposit_res").child(JSON.parse(no[0].substring(1))).set(req.body.Body.stkCallback);
-  // });
 
   res.status(200);
 });
