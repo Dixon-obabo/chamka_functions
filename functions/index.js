@@ -291,18 +291,18 @@ app.get("/stk", _access_token, (req, res)=>{
 
 app.post("/stk/lmstk", (req, res)=>{
   console.log(".............body..........");
+
   if (req.body.Body.stkCallback.ResultDesc=="Request cancelled by user") {
     db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
       const cool=JSON.stringify(snapshot.val());
 
       const no=cool.split(":");
       const not =cool.split(",");
-      const timestamp=not[2].split("at");
-      console.log(not[0]);
-      console.log(not[1]);
-      console.log(timestamp[1]);
-      // console.log(snapshot.val());
-      // console.log(cool);
+      const timestamp=not[2].toString().substring(12);
+
+      console.log(not[3].toString().replace("}}", "").substring(9));
+      const userid=not[3].toString().replace("}}", "").substring(9);
+
 
       const key=JSON.parse(no[0].substring(1));
       const am=no[1].toString().substring(1)+":"+no[2].toString();
@@ -312,9 +312,10 @@ app.post("/stk/lmstk", (req, res)=>{
       const trans={"TransactionType": "Deposit",
         "Status": "Failed",
         "Amount": JSON.parse(amount[1].toString()),
-        "userid": "The user id should be here",
-        "Timestamp": "Timestamp should be here"};
-
+        "userid": JSON.parse(userid),
+        "Timestamp": JSON.parse(timestamp),
+      };
+      db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
     });
   } else if (req.body.Body.stkCallback.ResultDesc=="The service request is processed successfully.") {
