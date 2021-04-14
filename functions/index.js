@@ -312,7 +312,7 @@ app.post("/stk/lmstk", (req, res)=>{
       const trans={"TransactionType": "Deposit",
         "Status": "Failed",
         "Amount": JSON.parse(amount[1].toString()),
-        "userid": JSON.parse(userid),
+        "Userid": JSON.parse(userid),
         "Timestamp": JSON.parse(timestamp),
       };
       db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
@@ -321,15 +321,28 @@ app.post("/stk/lmstk", (req, res)=>{
   } else if (req.body.Body.stkCallback.ResultDesc=="The service request is processed successfully.") {
     db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
       const cool=JSON.stringify(snapshot.val());
+
       const no=cool.split(":");
+      const not =cool.split(",");
+      const timestamp=not[2].toString().substring(12);
+
+      console.log(not[3].toString().replace("}}", "").substring(9));
+      const userid=not[3].toString().replace("}}", "").substring(9);
+
 
       const key=JSON.parse(no[0].substring(1));
-      console.log(key);
+      const am=no[1].toString().substring(1)+":"+no[2].toString();
+      const an=am.split(",");
+      const amount=an[0].split(":");
+
 
       const trans={"TransactionType": "Deposit",
         "Status": "Succeded",
-        "Amount": "100"};
-
+        "Amount": JSON.parse(amount[1].toString()),
+        "Userid": JSON.parse(userid),
+        "Timestamp": JSON.parse(timestamp),
+      };
+      db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
     });
   }
