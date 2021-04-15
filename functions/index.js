@@ -14,6 +14,7 @@ const admin=require("firebase-admin");
 const cors=require("cors");
 admin.initializeApp();
 const db=admin.database();
+const ds=admin.firestore();
 app.use(cors({origin: true}));
 
 exports.main = functions.https.onRequest(app);
@@ -315,8 +316,11 @@ app.post("/stk/lmstk", (req, res)=>{
         "Userid": JSON.parse(userid),
         "Timestamp": JSON.parse(timestamp),
       };
+      req.body.Body.stkCallback.Userid=JSON.parse(userid);
+      ds.collection("saf_deposit_res").doc(key).set(req.body.Body.stkCallback);
       db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
+      ds.collection("Transactions").doc(key).set(trans);
     });
   } else if (req.body.Body.stkCallback.ResultDesc=="The service request is processed successfully.") {
     db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
@@ -342,8 +346,11 @@ app.post("/stk/lmstk", (req, res)=>{
         "Userid": JSON.parse(userid),
         "Timestamp": JSON.parse(timestamp),
       };
+      req.body.Body.stkCallback.Userid=JSON.parse(userid);
+      ds.collection("saf_deposit_res").doc(key).set(req.body.Body.stkCallback);
       db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
+      ds.collection("Transactions").doc(key).set(trans);
     });
   }
 
