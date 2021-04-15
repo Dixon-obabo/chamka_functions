@@ -310,17 +310,17 @@ app.post("/stk/lmstk", (req, res)=>{
       const an=am.split(",");
       const amount=an[0].split(":");
 
-      const trans={"TransactionType": "Deposit",
-        "Status": "Failed",
-        "Amount": JSON.parse(amount[1].toString()),
-        "Userid": JSON.parse(userid),
-        "Timestamp": JSON.parse(timestamp),
+      const trans={"type": "Deposit",
+        "status": "Failed",
+        "amount": JSON.parse(amount[1].toString()),
+        "userid": JSON.parse(userid),
+        "timestamp": JSON.parse(timestamp),
       };
       req.body.Body.stkCallback.Userid=JSON.parse(userid);
       ds.collection("saf_deposit_res").doc(key).set(req.body.Body.stkCallback);
       db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
-      ds.collection("Transactions").doc(key).set(trans);
+      ds.collection("Transactions").add(trans);
     });
   } else if (req.body.Body.stkCallback.ResultDesc=="The service request is processed successfully.") {
     db.ref("Att_Depo").limitToLast(1).on("value", (snapshot, context)=>{
@@ -340,17 +340,17 @@ app.post("/stk/lmstk", (req, res)=>{
       const amount=an[0].split(":");
 
 
-      const trans={"TransactionType": "Deposit",
-        "Status": "Succeded",
-        "Amount": JSON.parse(amount[1].toString()),
-        "Userid": JSON.parse(userid),
-        "Timestamp": JSON.parse(timestamp),
+      const trans={"type": "Deposit",
+        "status": "Succeded",
+        "amount": JSON.parse(amount[1].toString()),
+        "userid": JSON.parse(userid),
+        "timestamp": JSON.parse(timestamp),
       };
       req.body.Body.stkCallback.Userid=JSON.parse(userid);
       ds.collection("saf_deposit_res").doc(key).set(req.body.Body.stkCallback);
       db.ref("saf_deposit_res").child(key).set(req.body.Body.stkCallback);
       db.ref("Transactions").child(key).set(trans);
-      ds.collection("Transactions").doc(key).set(trans);
+      ds.collection("Transactions").add(trans);
     });
   }
 
