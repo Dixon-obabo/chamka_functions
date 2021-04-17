@@ -112,12 +112,13 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
     },
   }).then((response)=>{
     token=response.data.access_token;
-    request({
+    axios({
       method: "POST",
       url: endpoint,
       headers: {
-        "Authorization": "Bearer "+ response.data.access_token,
-      }, json: {
+        "Authorization": "Bearer "+response.data.access_token,
+      },
+      data: {
         "InitiatorName": "apitest",
         "SecurityCredential": "Se0HgfA8WqRQ9WtQfKj9YjOSINYsQlUmojYlA40iIUxFAP4h8RgnJiG4AJ9A8suugSgWde+XVFolFa/bYg/+oms7tIanX1sYnaoFpIPuM2QTWNkkquo2YPJ/lpT+HKMDTisFjLA98g+lc1OyANEHTyxqi7iK/gJDbeGOe7mbNqaNOR6vnsQublR5tALJWjENW9Rmi3drpLtZLrdalym2YrCSkzqzoVPyp4tWNk/LS/7I4pBwuE5HjDx8Wu6n8Fee5J8QMlWckqxiITLe/1ap6EOlvpjW9fMy8Ir6Z97jaIirlUBe/NU3L1tOevx/GsFt0dXlCY4gn3g65STT4AYTTQ==",
         "CommandID": "BusinessPayment",
@@ -128,12 +129,35 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
         "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/timeout",
         "ResultURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
         "Occasion": "no occasion",
-      }}, function(error, response, body) {
-      if (error) {
-        console.log(error);
-      }
-      console.log(body);
+      },
+    }).then((rs)=>{
+      console.log(rs.data);
     });
+
+    // request({
+    //   method: "POST",
+    //   url: endpoint,
+    //   headers: {
+    //     "Authorization": "Bearer "+ response.data.access_token,
+    //   }, json: {
+    //     "InitiatorName": "apitest",
+    //     "SecurityCredential": "Se0HgfA8WqRQ9WtQfKj9YjOSINYsQlUmojYlA40iIUxFAP4h8RgnJiG4AJ9A8suugSgWde+XVFolFa/bYg/+oms7tIanX1sYnaoFpIPuM2QTWNkkquo2YPJ/lpT+HKMDTisFjLA98g+lc1OyANEHTyxqi7iK/gJDbeGOe7mbNqaNOR6vnsQublR5tALJWjENW9Rmi3drpLtZLrdalym2YrCSkzqzoVPyp4tWNk/LS/7I4pBwuE5HjDx8Wu6n8Fee5J8QMlWckqxiITLe/1ap6EOlvpjW9fMy8Ir6Z97jaIirlUBe/NU3L1tOevx/GsFt0dXlCY4gn3g65STT4AYTTQ==",
+    //     "CommandID": "BusinessPayment",
+    //     "Amount": "2300",
+    //     "PartyA": "600000",
+    //     "PartyB": "254796142444",
+    //     "Remarks": "You Won Nigga",
+    //     "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/timeout",
+    //     "ResultURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+    //     "Occasion": "no occasion",
+    //   }}, function(error, response, body) {
+    //   if (error) {
+    //     console.log(error);
+    //   }
+    //   console.log(body);
+    //   response.statusCode(200);
+    //   console.log(response.body);
+    // });
   }).catch((error)=>{
     console.log(error);
   });
@@ -239,29 +263,30 @@ app.post("/c2b/timeout", (req, res, next)=>{
   // next();
 });
 
-app.post("/c2b/validate", (req, res, next)=>{
+app.post("/c2b/validate", (req, res)=>{
   console.log(".......validate........");
-  // console.log(req.body);
-  res.status(200);
+  console.log(req.body);
   db.ref("Att_Loan").limitToLast(1).on("value", (snapshot, context)=>{
-    const cool =JSON.stringify(snapshot.val());
-    const key=JSON.parse(cool.split(":", 1).toString().substring(1));
-    const all=cool.split(",");
-    const time=all[4].toString().substring(12);
-    const tim=JSON.parse(time);
-    const trans={"type": "loan",
-      "amount": "amount should be here",
-      "status": "",
-      "userid": "",
-      "timestamp": time,
+    console.log("hello dickson ");
+    // const cool =JSON.stringify(snapshot.val());
+    // const key=JSON.parse(cool.split(":", 1).toString().substring(1));
+    // const all=cool.split(",");
+    // const time=all[4].toString().substring(12);
+    // const amo=all[0].split(":");
+    // const amount= JSON.parse(amo[2]);
+    // const uid= JSON.parse(all[5].toString().replace("}}", "").substring(9));
+    // const tim=JSON.parse(time);
+    // const trans={"type": "Loan",
+    //   "amount": amount,
+    //   "status": "Failed",
+    //   "userid": uid,
+    //   "timestamp": tim,
 
-    };
-    console.log(tim);
+    // };
+    // // console.log(amount);
+    // ds.collection("Transactions").add(trans);
   });
-
-
-  // ds.collection("Transactions").
-//  next();
+  res.status(200);
 });
 
 
