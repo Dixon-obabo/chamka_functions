@@ -8,14 +8,14 @@ const functions = require("firebase-functions");
 const express=require("express");
 const axios=require("axios").default;
 const request=require("request");
-const app=express();
+const app=axios;
 const moment= require("moment-timezone");
 const admin=require("firebase-admin");
 const cors=require("cors");
 admin.initializeApp();
 const db=admin.database();
 const ds=admin.firestore();
-app.use(cors({origin: true}));
+// app.use(cors({origin: true}));
 
 exports.main = functions.https.onRequest(app);
 app.get("/", (_req, res)=>{
@@ -94,9 +94,10 @@ exports.Deposit_attempt=functions.database.ref("/Att_Depo/{pushId}").onCreate((s
   return null;
 });
 
-exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snapshot, context )=>{
+exports.Loan_attempt= functions.database.ref("/Att_Loan/{pushId}").onCreate((snapshot, context )=>{
   // db.ref("/yourname").set("cool bruh it works");
   // console.log(snapshot.val());
+
   const consumer_key="hLOFxsToHsXKR4pzTSVoYoAop3J93B7X";
   const consumer_secret="PjfnfGEnm7aVfGba";
   const url="https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
@@ -105,6 +106,9 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
   const nope=moment.tz("Africa/Nairobi").format("YYYYMMDDHHmmss");
   const pword=new Buffer.from("174379"+"bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"+nope).toString("base64");
   let token="";
+  // app.post();
+
+
   axios({method: "get",
     url: url,
     headers: {
@@ -118,7 +122,7 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
       headers: {
         "Authorization": "Bearer "+response.data.access_token,
       },
-      data: {
+      data: JSON.stringify( {
         "InitiatorName": "apitest",
         "SecurityCredential": "Se0HgfA8WqRQ9WtQfKj9YjOSINYsQlUmojYlA40iIUxFAP4h8RgnJiG4AJ9A8suugSgWde+XVFolFa/bYg/+oms7tIanX1sYnaoFpIPuM2QTWNkkquo2YPJ/lpT+HKMDTisFjLA98g+lc1OyANEHTyxqi7iK/gJDbeGOe7mbNqaNOR6vnsQublR5tALJWjENW9Rmi3drpLtZLrdalym2YrCSkzqzoVPyp4tWNk/LS/7I4pBwuE5HjDx8Wu6n8Fee5J8QMlWckqxiITLe/1ap6EOlvpjW9fMy8Ir6Z97jaIirlUBe/NU3L1tOevx/GsFt0dXlCY4gn3g65STT4AYTTQ==",
         "CommandID": "BusinessPayment",
@@ -126,12 +130,15 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
         "PartyA": "600000",
         "PartyB": "254796142444",
         "Remarks": "You Won Nigga",
-        "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/timeout",
+        "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2btimeout",
         "ResultURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
         "Occasion": "no occasion",
-      },
+      }),
     }).then((rs)=>{
       console.log(rs.data);
+      // response.data(rs.data);
+    }).catch((er)=>{
+      console.log(er);
     });
 
     // request({
@@ -265,7 +272,7 @@ app.post("/c2b/timeout", (req, res, next)=>{
 
 app.post("/c2b/validate", (req, res)=>{
   console.log(".......validate........");
-  console.log(req.body);
+  // console.log(req.body);
   db.ref("Att_Loan").limitToLast(1).on("value", (snapshot, context)=>{
     console.log("hello dickson ");
     // const cool =JSON.stringify(snapshot.val());
@@ -287,6 +294,8 @@ app.post("/c2b/validate", (req, res)=>{
     // ds.collection("Transactions").add(trans);
   });
   res.status(200);
+}).catch((err)=>{
+  console.log(err);
 });
 
 
