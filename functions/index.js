@@ -125,7 +125,7 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
         "PartyA": "600000",
         "PartyB": "254796142444",
         "Remarks": "You Won Nigga",
-        "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
+        "QueueTimeOutURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/timeout",
         "ResultURL": "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
         "Occasion": "no occasion",
       }}, function(error, response, body) {
@@ -233,19 +233,42 @@ app.post("/c2b/confirm", (req, res)=>{
 
   db.ref("/comp").set(res.body);
 });
-
-
-app.post("/c2b/validate", (req, res, next)=>{
-  console.log(".......validate........");
+app.post("/c2b/timeout", (req, res, next)=>{
+  console.log("........Timeout........");
   console.log(req.body);
-  res.status(200);
   // next();
 });
 
-
-app.get("/c2b/validate", (req, res)=>{
-  console.log(req.body);
+app.post("/c2b/validate", (req, res, next)=>{
+  console.log(".......validate........");
+  // console.log(req.body);
   res.status(200);
+  db.ref("Att_Loan").limitToLast(1).on("value", (snapshot, context)=>{
+    const cool =JSON.stringify(snapshot.val());
+    const key=JSON.parse(cool.split(":", 1).toString().substring(1));
+    const all=cool.split(",");
+    const time=all[4].toString().substring(12);
+    const tim=JSON.parse(time);
+    const trans={"type": "loan",
+      "amount": "amount should be here",
+      "status": "",
+      "userid": "",
+      "timestamp": time,
+
+    };
+    console.log(tim);
+  });
+
+
+  // ds.collection("Transactions").
+//  next();
+});
+
+
+app.get("/c2b/validate", (req, res, next)=>{
+  console.log(req.body);
+  // res.status(200);
+  next();
 });
 
 app.get("/stk", _access_token, (req, res)=>{
