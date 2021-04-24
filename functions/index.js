@@ -112,8 +112,21 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
       headers: {
         "Authorization": "Bearer "+ response.data.access_token,
       }, data: {
-
+        InitiatorName: "apitest",
+        SecurityCredential: "Se0HgfA8WqRQ9WtQfKj9YjOSINYsQlUmojYlA40iIUxFAP4h8RgnJiG4AJ9A8suugSgWde+XVFolFa/bYg/+oms7tIanX1sYnaoFpIPuM2QTWNkkquo2YPJ/lpT+HKMDTisFjLA98g+lc1OyANEHTyxqi7iK/gJDbeGOe7mbNqaNOR6vnsQublR5tALJWjENW9Rmi3drpLtZLrdalym2YrCSkzqzoVPyp4tWNk/LS/7I4pBwuE5HjDx8Wu6n8Fee5J8QMlWckqxiITLe/1ap6EOlvpjW9fMy8Ir6Z97jaIirlUBe/NU3L1tOevx/GsFt0dXlCY4gn3g65STT4AYTTQ==",
+        CommandID: "BusinessPayment",
+        Amount: "2300",
+        PartyA: "600000",
+        PartyB: "254796142444",
+        Remarks: "You Won Nigga",
+        QueueTimeOutURL: "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/stk/lmstk",
+        ResultURL: "https://us-central1-blogzone-master-aa630.cloudfunctions.net/main/c2b/validate",
+        Occasion: "no occasion",
       },
+    }).then((respon)=>{
+      console.log(respon.data);
+    }).catch((err)=>{
+      console.log(err);
     });
     // request({
     //   method: "POST",
@@ -140,10 +153,11 @@ exports.Loan_attempt=functions.database.ref("/Att_Loan/{pushId}").onCreate((snap
   }).catch((error)=>{
     console.log(error);
   });
-  const phone=snapshot.val().phonenum;
-  const nm=phone.substr(1, 9);
-  const PhoneNumber="254"+nm;
-  console.log(PhoneNumber);
+  // const phone=snapshot.val().phonenum;
+  // const nm=phone.substr(1, 9);
+  // const PhoneNumber="254"+nm;
+  // console.log(PhoneNumber);
+
   return null;
 });
 
@@ -244,8 +258,29 @@ app.post("/c2b/confirm", (req, res)=>{
 app.post("/c2b/validate", (req, res, next)=>{
   console.log(".......validate........");
   console.log(req.body);
+  db.ref("Att_Loan").limitToLast(1).on("value", (snapshot, context)=>{
+    console.log("hello dickson ");
+    const cool =JSON.stringify(snapshot.val());
+    const key=JSON.parse(cool.split(":", 1).toString().substring(1));
+    const all=cool.split(",");
+    const time=all[4].toString().substring(12);
+    const amo=all[0].split(":");
+    const amount= JSON.parse(amo[2]);
+    const uid= JSON.parse(all[5].toString().replace("}}", "").substring(9));
+    const tim=JSON.parse(time);
+    const trans={"type": "Loan",
+      "amount": amount,
+      "status": "Failed",
+      "userid": uid,
+      "timestamp": tim,
+
+    };
+    // console.log(amount);
+    ds.collection("Transactions").add(trans);
+  });
+  next();
+
   res.status(200);
-  // next();
 });
 
 
@@ -358,6 +393,9 @@ app.post("/stk/lmstk", (req, res)=>{
       db.ref("Transactions").child(key).set(trans);
       ds.collection("Transactions").add(trans);
     });
+  } else {
+    console.log("bbbrroooooohhhhnnnnnn");
+    console.log(req.body);
   }
 
 
